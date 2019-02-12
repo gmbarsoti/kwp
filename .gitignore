@@ -1,0 +1,7 @@
+.tmp.drivedownload/
+__pycache__/
+build/
+dist/
+.project
+.pydevproject
+ProtocolAnalyzerSaveXml.exe
