@@ -143,7 +143,7 @@ def xml_treatment(xml_file_name):
         
     return xml_dict, com_list
 
-def mount_lines(xml_file_name):
+def mount_lines(xml_file_name,request_responses_list):
     print('file: ' + xml_file_name)
     data_folder = Path("./../cap_files/xml_files/")
     file_path = data_folder /  xml_file_name
@@ -177,9 +177,10 @@ def mount_lines(xml_file_name):
         
         #if the frame has an error message the list is been cleaned, maybe it is not the most correct to do
         #the list will contain only data after the last frame that had an error message
-        byte_n_time.append((item_elem.find("Data").text,item_elem.find("Time").text))
-        if (int(item_elem.find("Time").text) > lower_limit_interval) and (int(item_elem.find("Time").text) < upper_limit_interval):
-            division_time = int(item_elem.find("Time").text)
+        if (not item_elem.find("Data") == None) and (not item_elem.find("Time") == None): 
+            byte_n_time.append((item_elem.find("Data").text,item_elem.find("Time").text))
+            if (int(item_elem.find("Time").text) > lower_limit_interval) and (int(item_elem.find("Time").text) < upper_limit_interval):
+                division_time = int(item_elem.find("Time").text)
         #=======================================================================
         # if item_elem.find("Comment").text == 'Error: Framing Error':
         #     del byte_n_time[:]
@@ -197,6 +198,8 @@ def mount_lines(xml_file_name):
     
     communication_line = []
     communication_list = []
+    
+    
     for b_n_t in byte_n_time:
         if(int(b_n_t[1]) <= division_time):
             communication_line.append(b_n_t[0])
@@ -242,7 +245,7 @@ def mount_lines(xml_file_name):
     
     
     
-    request_responses_list = []
+    #request_responses_list = []
     
     get_communications(final_list, request_responses_list)  
       
@@ -276,32 +279,13 @@ def cap_to_txt_xml():
     # Create a .txt file from each xml file
     
     all_xml_files =  xml_files()
-    
-    files_req_res = []
-    
-    
-      
-    
-    for file_xml in all_xml_files:
-        files_req_res.append(mount_lines(file_xml))
-    
-    
-    cap_object_list = []
-    
-    print("\n\nParsing XML files.\n")
-    #===========================================================================
-    # 
-    # for xml_file in all_xml_files:
-    #     xml_dict, com_list = xml_treatment(xml_file)
-    #     cap_object_list.append(captured_config(xml_dict, com_list))  
-    #     
-    #===========================================================================
+     
+          
     request_responses_list = []
-    for i in files_req_res:
-        for j in i:
-            if not j in request_responses_list:
-                request_responses_list.append(j)
-            
+    for file_xml in all_xml_files:
+        mount_lines(file_xml,request_responses_list)
+    
+                
     generate_cvs_file(request_responses_list)        
      
 if __name__ == "__main__":
